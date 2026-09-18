@@ -1,12 +1,14 @@
 import { Link } from "react-router-dom";
 
 const categories = [
-  { name: "Pizza", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400" },
-  { name: "Burgers", image: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400" },
-  { name: "Main Course", image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400" },
-  { name: "Salads", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400" },
-  { name: "Desserts", image: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400" },
-  { name: "Beverages", image: "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400" },
+  { name: "Starters", image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400" },
+  { name: "Main Course", image: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400" },
+  { name: "Biryani & Rice", image: "https://images.unsplash.com/photo-1563379091339-03246963d96c?w=400" },
+  { name: "Breads", image: "https://images.unsplash.com/photo-1626777553635-be9b6d7cb32e?w=400" },
+  { name: "South Indian", image: "https://images.unsplash.com/photo-1630383249896-424e482df921?w=400" },
+  { name: "Chaat & Street Food", image: "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400" },
+  { name: "Desserts", image: "https://images.unsplash.com/photo-1666190092760-9e5377cadb85?w=400" },
+  { name: "Beverages", image: "https://images.unsplash.com/photo-1571934811356-5cc061b6821f?w=400" },
 ];
 
 const CategoryGrid = () => (
@@ -17,7 +19,7 @@ const CategoryGrid = () => (
       </h2>
       <p className="mt-2 text-ink-500 dark:text-ink-400">Find exactly what you're craving</p>
     </div>
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
       {categories.map((cat) => (
         <Link
           key={cat.name}

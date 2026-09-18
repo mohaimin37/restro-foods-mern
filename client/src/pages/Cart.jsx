@@ -8,6 +8,8 @@ import {
   decrementItem,
   removeFromCart,
 } from "../features/cart/cartSlice";
+import { formatPrice } from "../utils/format";
+import { TAX_RATE, DELIVERY_FEE, FREE_DELIVERY_THRESHOLD } from "../utils/pricing";
 
 const Cart = () => {
   const items = useSelector(selectCartItems);
@@ -16,8 +18,8 @@ const Cart = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
 
-  const deliveryFee = subtotal >= 40 || subtotal === 0 ? 0 : 3.99;
-  const tax = Number((subtotal * 0.08).toFixed(2));
+  const deliveryFee = subtotal >= FREE_DELIVERY_THRESHOLD || subtotal === 0 ? 0 : DELIVERY_FEE;
+  const tax = Number((subtotal * TAX_RATE).toFixed(2));
   const total = Number((subtotal + deliveryFee + tax).toFixed(2));
 
   const handleCheckout = () => {
@@ -52,7 +54,7 @@ const Cart = () => {
               <img src={item.image} alt={item.name} className="h-20 w-20 rounded-xl object-cover" />
               <div className="flex-1">
                 <h3 className="font-semibold text-ink-900 dark:text-white">{item.name}</h3>
-                <p className="text-sm text-ink-500">${item.price.toFixed(2)} each</p>
+                <p className="text-sm text-ink-500">{formatPrice(item.price)} each</p>
               </div>
               <div className="flex items-center gap-3 rounded-full border border-ink-200 px-3 py-1.5 dark:border-ink-700">
                 <button onClick={() => dispatch(decrementItem(item.menuItem))} aria-label="Decrease">
@@ -63,8 +65,8 @@ const Cart = () => {
                   <FaPlus size={11} />
                 </button>
               </div>
-              <div className="w-16 text-right font-semibold text-ink-900 dark:text-white">
-                ${(item.price * item.quantity).toFixed(2)}
+              <div className="w-20 text-right font-semibold text-ink-900 dark:text-white">
+                {formatPrice(item.price * item.quantity)}
               </div>
               <button
                 onClick={() => dispatch(removeFromCart(item.menuItem))}
@@ -80,20 +82,20 @@ const Cart = () => {
         <div className="card h-fit p-6">
           <h2 className="mb-4 font-display text-lg font-bold text-ink-900 dark:text-white">Order Summary</h2>
           <div className="space-y-2 text-sm text-ink-600 dark:text-ink-300">
-            <div className="flex justify-between"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
             <div className="flex justify-between">
               <span>Delivery</span>
-              <span>{deliveryFee === 0 ? "Free" : `$${deliveryFee.toFixed(2)}`}</span>
+              <span>{deliveryFee === 0 ? "Free" : formatPrice(deliveryFee)}</span>
             </div>
-            <div className="flex justify-between"><span>Tax (8%)</span><span>${tax.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span>GST (5%)</span><span>{formatPrice(tax)}</span></div>
           </div>
           <div className="my-4 border-t border-dashed border-ink-200 dark:border-ink-700" />
           <div className="mb-6 flex justify-between font-display text-lg font-bold text-ink-900 dark:text-white">
-            <span>Total</span><span>${total.toFixed(2)}</span>
+            <span>Total</span><span>{formatPrice(total)}</span>
           </div>
-          {subtotal < 40 && (
+          {subtotal < FREE_DELIVERY_THRESHOLD && (
             <p className="mb-4 rounded-lg bg-brand-50 px-3 py-2 text-xs text-brand-700 dark:bg-brand-900/30 dark:text-brand-300">
-              Add ${(40 - subtotal).toFixed(2)} more for free delivery!
+              Add {formatPrice(FREE_DELIVERY_THRESHOLD - subtotal)} more for free delivery!
             </p>
           )}
           <button onClick={handleCheckout} className="btn-primary w-full">

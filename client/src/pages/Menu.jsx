@@ -5,7 +5,17 @@ import DishCard from "../components/DishCard";
 import Loader from "../components/Loader";
 import { getMenuItems } from "../api/menuApi";
 
-const categories = ["All", "Starters", "Main Course", "Pizza", "Burgers", "Salads", "Desserts", "Beverages"];
+const categories = [
+  "All",
+  "Starters",
+  "Main Course",
+  "Biryani & Rice",
+  "Breads",
+  "South Indian",
+  "Chaat & Street Food",
+  "Desserts",
+  "Beverages",
+];
 
 const Menu = () => {
   const [searchParams, setSearchParams] = useSearchParams();

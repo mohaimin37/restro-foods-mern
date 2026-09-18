@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import toast from "react-hot-toast";
 import Loader from "../../components/Loader";
 import { getAllOrders, updateOrderStatus } from "../../api/orderApi";
+import { formatPrice } from "../../utils/format";
 
 const statusOptions = ["Pending", "Confirmed", "Preparing", "Out for Delivery", "Delivered", "Cancelled"];
 
@@ -63,7 +64,7 @@ const ManageOrders = () => {
                   <p className="text-xs text-ink-400">{order.user?.email}</p>
                 </td>
                 <td className="p-4">{format(new Date(order.createdAt), "MMM d, h:mm a")}</td>
-                <td className="p-4 font-semibold">${order.totalPrice.toFixed(2)}</td>
+                <td className="p-4 font-semibold">{formatPrice(order.totalPrice)}</td>
                 <td className="p-4">
                   <span className={`badge ${order.isPaid ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
                     {order.isPaid ? "Paid" : "Unpaid"}

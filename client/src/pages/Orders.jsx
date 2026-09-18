@@ -5,6 +5,7 @@ import { FaBoxOpen, FaArrowRight } from "react-icons/fa";
 import Loader from "../components/Loader";
 import OrderStatusBadge from "../components/OrderStatusBadge";
 import { getMyOrders } from "../api/orderApi";
+import { formatPrice } from "../utils/format";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -47,7 +48,7 @@ const Orders = () => {
               <div className="flex items-center gap-4">
                 <OrderStatusBadge status={order.status} />
                 <span className="font-display font-bold text-ink-900 dark:text-white">
-                  ${order.totalPrice.toFixed(2)}
+                  {formatPrice(order.totalPrice)}
                 </span>
                 <FaArrowRight className="text-ink-400" size={13} />
               </div>

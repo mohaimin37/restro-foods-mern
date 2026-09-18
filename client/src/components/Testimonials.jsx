@@ -3,21 +3,21 @@ import StarRating from "./StarRating";
 
 const testimonials = [
   {
-    name: "Sarah Mitchell",
+    name: "Priya Sharma",
     role: "Regular Customer",
-    text: "The butter chicken tastes just like homemade. Delivery was quick and the packaging kept everything hot!",
+    text: "The butter chicken tastes just like ghar ka khana. Delivery was quick and the packaging kept everything piping hot!",
     rating: 5,
   },
   {
-    name: "James Carter",
+    name: "Rohan Mehta",
     role: "Food Blogger",
-    text: "Restro Foods has the best pizza in town. Fresh toppings, perfectly crisp crust, every single time.",
+    text: "Best biryani in the city, hands down. Perfectly cooked rice, generous portions, and the dum flavor is spot on.",
     rating: 5,
   },
   {
-    name: "Aisha Khan",
+    name: "Ananya Iyer",
     role: "Verified Buyer",
-    text: "Booked a table for my anniversary and the whole experience was seamless from reservation to dessert.",
+    text: "Booked a table for my anniversary and the whole experience was seamless, from reservation to the last bite of gulab jamun.",
     rating: 4.5,
   },
 ];

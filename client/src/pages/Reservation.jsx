@@ -60,7 +60,7 @@ const Reservation = () => {
           </div>
           <div>
             <label className="label"><FaPhoneAlt className="mr-1 inline" size={12} /> Phone</label>
-            <input name="phone" required value={form.phone} onChange={handleChange} className="input" />
+            <input name="phone" required value={form.phone} onChange={handleChange} className="input" placeholder="+91 98765 43210" />
           </div>
         </div>
 

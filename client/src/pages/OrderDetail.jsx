@@ -6,6 +6,7 @@ import { FaArrowLeft, FaMapMarkerAlt, FaPhoneAlt } from "react-icons/fa";
 import Loader from "../components/Loader";
 import OrderStatusBadge from "../components/OrderStatusBadge";
 import { getOrderById } from "../api/orderApi";
+import { formatPrice } from "../utils/format";
 
 const steps = ["Pending", "Confirmed", "Preparing", "Out for Delivery", "Delivered"];
 
@@ -79,7 +80,7 @@ const OrderDetail = () => {
                 <p className="text-sm text-ink-500">Qty: {item.quantity}</p>
               </div>
               <p className="font-semibold text-ink-900 dark:text-white">
-                ${(item.price * item.quantity).toFixed(2)}
+                {formatPrice(item.price * item.quantity)}
               </p>
             </div>
           ))}
@@ -100,12 +101,12 @@ const OrderDetail = () => {
           <div className="card p-5">
             <h3 className="mb-3 font-display font-bold text-ink-900 dark:text-white">Payment Summary</h3>
             <div className="space-y-2 text-sm text-ink-600 dark:text-ink-300">
-              <div className="flex justify-between"><span>Subtotal</span><span>${order.itemsPrice.toFixed(2)}</span></div>
-              <div className="flex justify-between"><span>Delivery</span><span>${order.deliveryPrice.toFixed(2)}</span></div>
-              <div className="flex justify-between"><span>Tax</span><span>${order.taxPrice.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span>Subtotal</span><span>{formatPrice(order.itemsPrice)}</span></div>
+              <div className="flex justify-between"><span>Delivery</span><span>{order.deliveryPrice === 0 ? "Free" : formatPrice(order.deliveryPrice)}</span></div>
+              <div className="flex justify-between"><span>GST</span><span>{formatPrice(order.taxPrice)}</span></div>
               <div className="my-2 border-t border-dashed border-ink-200 dark:border-ink-700" />
               <div className="flex justify-between font-display text-base font-bold text-ink-900 dark:text-white">
-                <span>Total</span><span>${order.totalPrice.toFixed(2)}</span>
+                <span>Total</span><span>{formatPrice(order.totalPrice)}</span>
               </div>
             </div>
             <p className="mt-3 text-xs text-ink-400">

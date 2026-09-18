@@ -8,8 +8,18 @@ import {
   updateMenuItem,
   deleteMenuItem,
 } from "../../api/menuApi";
+import { formatPrice } from "../../utils/format";
 
-const categories = ["Starters", "Main Course", "Pizza", "Burgers", "Desserts", "Beverages", "Salads"];
+const categories = [
+  "Starters",
+  "Main Course",
+  "Biryani & Rice",
+  "Breads",
+  "South Indian",
+  "Chaat & Street Food",
+  "Desserts",
+  "Beverages",
+];
 
 const emptyForm = {
   name: "",
@@ -131,8 +141,8 @@ const ManageMenu = () => {
               <textarea name="description" required rows={2} value={form.description} onChange={handleChange} className="input resize-none" />
             </div>
             <div>
-              <label className="label">Price ($)</label>
-              <input type="number" step="0.01" name="price" required value={form.price} onChange={handleChange} className="input" />
+              <label className="label">Price (₹)</label>
+              <input type="number" step="1" name="price" required value={form.price} onChange={handleChange} className="input" />
             </div>
             <div>
               <label className="label">Image URL</label>
@@ -192,7 +202,7 @@ const ManageMenu = () => {
                   <span className="font-medium text-ink-800 dark:text-ink-100">{item.name}</span>
                 </td>
                 <td className="p-4">{item.category}</td>
-                <td className="p-4">${item.price.toFixed(2)}</td>
+                <td className="p-4">{formatPrice(item.price)}</td>
                 <td className="p-4">{item.rating.toFixed(1)} ({item.numReviews})</td>
                 <td className="p-4">
                   <span className={`badge ${item.isAvailable ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>

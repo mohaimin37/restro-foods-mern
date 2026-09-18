@@ -1,13 +1,13 @@
-import Stripe from "stripe";
+﻿import Stripe from "stripe";
 import asyncHandler from "../middleware/asyncHandler.js";
 import Order from "../models/Order.js";
 import MenuItem from "../models/MenuItem.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-const TAX_RATE = 0.08;
-const DELIVERY_FEE = 3.99;
-const FREE_DELIVERY_THRESHOLD = 40;
+const TAX_RATE = 0.05; // GST
+const DELIVERY_FEE = 49;
+const FREE_DELIVERY_THRESHOLD = 499;
 
 // @desc    Create a Stripe Checkout session and a pending order
 // @route   POST /api/payments/create-checkout-session
@@ -58,7 +58,7 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
 
   const line_items = orderItems.map((item) => ({
     price_data: {
-      currency: "usd",
+      currency: "inr",
       product_data: { name: item.name, images: [item.image] },
       unit_amount: Math.round(item.price * 100),
     },
@@ -67,13 +67,13 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
 
   if (taxPrice > 0) {
     line_items.push({
-      price_data: { currency: "usd", product_data: { name: "Tax" }, unit_amount: Math.round(taxPrice * 100) },
+      price_data: { currency: "inr", product_data: { name: "Tax" }, unit_amount: Math.round(taxPrice * 100) },
       quantity: 1,
     });
   }
   if (deliveryPrice > 0) {
     line_items.push({
-      price_data: { currency: "usd", product_data: { name: "Delivery Fee" }, unit_amount: Math.round(deliveryPrice * 100) },
+      price_data: { currency: "inr", product_data: { name: "Delivery Fee" }, unit_amount: Math.round(deliveryPrice * 100) },
       quantity: 1,
     });
   }
@@ -153,3 +153,4 @@ export const verifyCheckoutSession = asyncHandler(async (req, res) => {
 
   res.json({ success: true, paymentStatus: session.payment_status });
 });
+

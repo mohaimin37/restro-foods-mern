@@ -9,7 +9,7 @@ const Footer = () => (
           <FaUtensils /> Restro<span className="text-ink-900 dark:text-white">Foods</span>
         </Link>
         <p className="mt-3 text-sm text-ink-500 dark:text-ink-400">
-          Fresh ingredients, bold flavors, delivered fast. Your neighborhood kitchen, online.
+          Authentic Indian flavors, cooked fresh and delivered hot. Your neighborhood dhaba, online.
         </p>
         <div className="mt-4 flex gap-3 text-ink-500 dark:text-ink-400">
           <a href="#" aria-label="Facebook" className="hover:text-brand-600"><FaFacebook size={18} /></a>
@@ -31,8 +31,8 @@ const Footer = () => (
       <div>
         <h4 className="mb-3 font-display font-semibold text-ink-900 dark:text-white">Categories</h4>
         <ul className="space-y-2 text-sm text-ink-500 dark:text-ink-400">
-          <li><Link to="/menu?category=Pizza" className="hover:text-brand-600">Pizza</Link></li>
-          <li><Link to="/menu?category=Burgers" className="hover:text-brand-600">Burgers</Link></li>
+          <li><Link to="/menu?category=Biryani %26 Rice" className="hover:text-brand-600">Biryani & Rice</Link></li>
+          <li><Link to="/menu?category=South Indian" className="hover:text-brand-600">South Indian</Link></li>
           <li><Link to="/menu?category=Main Course" className="hover:text-brand-600">Main Course</Link></li>
           <li><Link to="/menu?category=Desserts" className="hover:text-brand-600">Desserts</Link></li>
         </ul>
@@ -41,8 +41,8 @@ const Footer = () => (
       <div>
         <h4 className="mb-3 font-display font-semibold text-ink-900 dark:text-white">Contact Us</h4>
         <ul className="space-y-3 text-sm text-ink-500 dark:text-ink-400">
-          <li className="flex items-start gap-2"><FaMapMarkerAlt className="mt-0.5 shrink-0 text-brand-500" /> 221B Flavor Street, Foodville</li>
-          <li className="flex items-center gap-2"><FaPhoneAlt className="text-brand-500" /> +1 (555) 123-4567</li>
+          <li className="flex items-start gap-2"><FaMapMarkerAlt className="mt-0.5 shrink-0 text-brand-500" /> 12, MG Road, Indiranagar, Bengaluru, Karnataka 560038</li>
+          <li className="flex items-center gap-2"><FaPhoneAlt className="text-brand-500" /> +91 98765 43210</li>
           <li className="flex items-center gap-2"><FaEnvelope className="text-brand-500" /> hello@restrofoods.com</li>
         </ul>
       </div>

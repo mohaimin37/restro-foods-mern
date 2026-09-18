@@ -6,6 +6,7 @@ import Loader from "../components/Loader";
 import { verifyCheckoutSession } from "../api/paymentApi";
 import { getOrderById } from "../api/orderApi";
 import { clearCart } from "../features/cart/cartSlice";
+import { formatPrice } from "../utils/format";
 
 const OrderSuccess = () => {
   const { id } = useParams();
@@ -55,7 +56,7 @@ const OrderSuccess = () => {
             <span>Status</span><span className="font-medium">{order.status}</span>
           </div>
           <div className="mt-2 flex justify-between font-display font-bold text-ink-900 dark:text-white">
-            <span>Total</span><span>${order.totalPrice.toFixed(2)}</span>
+            <span>Total</span><span>{formatPrice(order.totalPrice)}</span>
           </div>
         </div>
       )}

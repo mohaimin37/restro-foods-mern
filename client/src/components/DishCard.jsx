@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import StarRating from "./StarRating";
 import { addToCart } from "../features/cart/cartSlice";
+import { formatPrice } from "../utils/format";
 
 const DishCard = ({ dish }) => {
   const dispatch = useDispatch();
@@ -48,7 +49,7 @@ const DishCard = ({ dish }) => {
           <div className="mb-1 flex items-start justify-between gap-2">
             <h3 className="font-display font-semibold text-ink-900 dark:text-white">{dish.name}</h3>
             <span className="whitespace-nowrap font-display font-bold text-brand-600">
-              ${dish.price.toFixed(2)}
+              {formatPrice(dish.price)}
             </span>
           </div>
           <p className="mb-2 line-clamp-2 text-sm text-ink-500 dark:text-ink-400">

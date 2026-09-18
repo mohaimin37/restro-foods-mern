@@ -64,27 +64,27 @@ const Profile = () => {
           </div>
           <div>
             <label className="label">Phone</label>
-            <input name="phone" value={form.phone} onChange={handleChange} className="input" />
+            <input name="phone" value={form.phone} onChange={handleChange} className="input" placeholder="+91 98765 43210" />
           </div>
         </div>
 
         <div>
-          <label className="label">Street Address</label>
-          <input name="street" value={form.street} onChange={handleChange} className="input" />
+          <label className="label">Flat / House No., Street, Area</label>
+          <input name="street" value={form.street} onChange={handleChange} className="input" placeholder="e.g. 12, MG Road, Indiranagar" />
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
             <label className="label">City</label>
-            <input name="city" value={form.city} onChange={handleChange} className="input" />
+            <input name="city" value={form.city} onChange={handleChange} className="input" placeholder="e.g. Bengaluru" />
           </div>
           <div>
             <label className="label">State</label>
-            <input name="state" value={form.state} onChange={handleChange} className="input" />
+            <input name="state" value={form.state} onChange={handleChange} className="input" placeholder="e.g. Karnataka" />
           </div>
           <div>
-            <label className="label">ZIP</label>
-            <input name="zip" value={form.zip} onChange={handleChange} className="input" />
+            <label className="label">PIN Code</label>
+            <input name="zip" value={form.zip} onChange={handleChange} className="input" placeholder="e.g. 560038" />
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  FaDollarSign,
+  FaRupeeSign,
   FaShoppingBag,
   FaUsers,
   FaCalendarCheck,
@@ -21,6 +21,7 @@ import {
 import Loader from "../../components/Loader";
 import StatCard from "../../components/StatCard";
 import { getDashboardStats } from "../../api/adminApi";
+import { formatPrice } from "../../utils/format";
 
 const COLORS = ["#f97316", "#3b82f6", "#a855f7", "#6366f1", "#22c55e", "#ef4444"];
 
@@ -44,7 +45,7 @@ const AdminDashboard = () => {
       <h1 className="mb-6 font-display text-2xl font-bold text-ink-900 dark:text-white">Dashboard</h1>
 
       <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={FaDollarSign} label="Total Revenue" value={`$${stats.totalRevenue.toFixed(2)}`} accent="green" />
+        <StatCard icon={FaRupeeSign} label="Total Revenue" value={formatPrice(stats.totalRevenue)} accent="green" />
         <StatCard icon={FaShoppingBag} label="Total Orders" value={stats.totalOrders} accent="brand" />
         <StatCard icon={FaUsers} label="Customers" value={stats.totalUsers} accent="blue" />
         <StatCard icon={FaCalendarCheck} label="Pending Reservations" value={stats.pendingReservations} accent="purple" />
@@ -64,7 +65,7 @@ const AdminDashboard = () => {
               <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
               <XAxis dataKey="_id" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} />
-              <Tooltip formatter={(v) => `$${v.toFixed(2)}`} />
+              <Tooltip formatter={(v) => formatPrice(v)} />
               <Area type="monotone" dataKey="revenue" stroke="#f97316" fill="url(#rev)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
@@ -102,7 +103,7 @@ const AdminDashboard = () => {
                 <tr key={d._id} className="border-b border-ink-50 dark:border-ink-800/50">
                   <td className="py-2.5 font-medium text-ink-800 dark:text-ink-100">{d.name}</td>
                   <td className="py-2.5">{d.totalSold}</td>
-                  <td className="py-2.5">${d.revenue.toFixed(2)}</td>
+                  <td className="py-2.5">{formatPrice(d.revenue)}</td>
                 </tr>
               ))}
             </tbody>

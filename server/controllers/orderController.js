@@ -2,9 +2,9 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import Order from "../models/Order.js";
 import MenuItem from "../models/MenuItem.js";
 
-const TAX_RATE = 0.08;
-const DELIVERY_FEE = 3.99;
-const FREE_DELIVERY_THRESHOLD = 40;
+const TAX_RATE = 0.05; // GST
+const DELIVERY_FEE = 49;
+const FREE_DELIVERY_THRESHOLD = 499;
 
 // @desc    Create new order (used for Cash on Delivery; Stripe orders are created after payment confirmation)
 // @route   POST /api/orders

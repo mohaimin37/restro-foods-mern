@@ -6,6 +6,8 @@ import { FaCreditCard, FaMoneyBillWave, FaLock } from "react-icons/fa";
 import { selectCartItems, selectCartSubtotal, clearCart } from "../features/cart/cartSlice";
 import { createCheckoutSession } from "../api/paymentApi";
 import { createOrder } from "../api/orderApi";
+import { formatPrice } from "../utils/format";
+import { TAX_RATE, DELIVERY_FEE, FREE_DELIVERY_THRESHOLD } from "../utils/pricing";
 
 const Checkout = () => {
   const items = useSelector(selectCartItems);
@@ -24,8 +26,8 @@ const Checkout = () => {
     phone: user?.phone || "",
   });
 
-  const deliveryFee = subtotal >= 40 ? 0 : 3.99;
-  const tax = Number((subtotal * 0.08).toFixed(2));
+  const deliveryFee = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
+  const tax = Number((subtotal * TAX_RATE).toFixed(2));
   const total = Number((subtotal + deliveryFee + tax).toFixed(2));
 
   const handleChange = (e) => setAddress({ ...address, [e.target.name]: e.target.value });
@@ -68,31 +70,31 @@ const Checkout = () => {
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <label className="label">Street Address</label>
+                <label className="label">Flat / House No., Street, Area</label>
                 <input
                   name="street"
                   required
                   value={address.street}
                   onChange={handleChange}
                   className="input"
-                  placeholder="123 Main Street"
+                  placeholder="e.g. 12, MG Road, Indiranagar"
                 />
               </div>
               <div>
                 <label className="label">City</label>
-                <input name="city" required value={address.city} onChange={handleChange} className="input" />
+                <input name="city" required value={address.city} onChange={handleChange} className="input" placeholder="e.g. Bengaluru" />
               </div>
               <div>
                 <label className="label">State</label>
-                <input name="state" required value={address.state} onChange={handleChange} className="input" />
+                <input name="state" required value={address.state} onChange={handleChange} className="input" placeholder="e.g. Karnataka" />
               </div>
               <div>
-                <label className="label">ZIP Code</label>
-                <input name="zip" required value={address.zip} onChange={handleChange} className="input" />
+                <label className="label">PIN Code</label>
+                <input name="zip" required value={address.zip} onChange={handleChange} className="input" placeholder="e.g. 560001" />
               </div>
               <div>
                 <label className="label">Phone</label>
-                <input name="phone" required value={address.phone} onChange={handleChange} className="input" />
+                <input name="phone" required value={address.phone} onChange={handleChange} className="input" placeholder="+91 98765 43210" />
               </div>
             </div>
           </div>
@@ -142,22 +144,22 @@ const Checkout = () => {
             {items.map((item) => (
               <div key={item.menuItem} className="flex justify-between text-ink-600 dark:text-ink-300">
                 <span>{item.quantity} x {item.name}</span>
-                <span>${(item.price * item.quantity).toFixed(2)}</span>
+                <span>{formatPrice(item.price * item.quantity)}</span>
               </div>
             ))}
           </div>
           <div className="my-4 border-t border-dashed border-ink-200 dark:border-ink-700" />
           <div className="space-y-2 text-sm text-ink-600 dark:text-ink-300">
-            <div className="flex justify-between"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
-            <div className="flex justify-between"><span>Delivery</span><span>{deliveryFee === 0 ? "Free" : `$${deliveryFee.toFixed(2)}`}</span></div>
-            <div className="flex justify-between"><span>Tax</span><span>${tax.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
+            <div className="flex justify-between"><span>Delivery</span><span>{deliveryFee === 0 ? "Free" : formatPrice(deliveryFee)}</span></div>
+            <div className="flex justify-between"><span>GST</span><span>{formatPrice(tax)}</span></div>
           </div>
           <div className="my-4 border-t border-dashed border-ink-200 dark:border-ink-700" />
           <div className="mb-6 flex justify-between font-display text-lg font-bold text-ink-900 dark:text-white">
-            <span>Total</span><span>${total.toFixed(2)}</span>
+            <span>Total</span><span>{formatPrice(total)}</span>
           </div>
           <button type="submit" disabled={loading} className="btn-primary w-full">
-            <FaLock size={12} /> {loading ? "Processing..." : `Place Order - $${total.toFixed(2)}`}
+            <FaLock size={12} /> {loading ? "Processing..." : `Place Order - ${formatPrice(total)}`}
           </button>
         </div>
       </form>

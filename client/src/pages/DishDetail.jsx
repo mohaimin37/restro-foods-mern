@@ -10,6 +10,7 @@ import ReviewList from "../components/ReviewList";
 import { getMenuItemById } from "../api/menuApi";
 import { getReviewsForItem, createReview, deleteReview } from "../api/reviewApi";
 import { addToCart } from "../features/cart/cartSlice";
+import { formatPrice } from "../utils/format";
 
 const DishDetail = () => {
   const { id } = useParams();
@@ -112,7 +113,7 @@ const DishDetail = () => {
           <div className="mt-2 text-sm text-ink-400">{dish.calories} kcal</div>
 
           <div className="mt-6 font-display text-3xl font-bold text-brand-600">
-            ${dish.price.toFixed(2)}
+            {formatPrice(dish.price)}
           </div>
 
           <div className="mt-6 flex items-center gap-4">
