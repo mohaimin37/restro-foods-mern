@@ -1,16 +1,13 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import Order from "../models/Order.js";
 import MenuItem from "../models/MenuItem.js";
-
-const TAX_RATE = 0.05; // GST
-const DELIVERY_FEE = 49;
-const FREE_DELIVERY_THRESHOLD = 499;
+import { computeOrderPricing, markCouponUsed } from "../utils/pricing.js";
 
 // @desc    Create new order (used for Cash on Delivery; Stripe orders are created after payment confirmation)
 // @route   POST /api/orders
 // @access  Private
 export const createOrder = asyncHandler(async (req, res) => {
-  const { items, shippingAddress, paymentMethod } = req.body;
+  const { items, shippingAddress, paymentMethod, couponCode } = req.body;
 
   if (!items || items.length === 0) {
     res.status(400);
@@ -36,9 +33,14 @@ export const createOrder = asyncHandler(async (req, res) => {
     };
   });
 
-  const deliveryPrice = itemsPrice >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
-  const taxPrice = Number((itemsPrice * TAX_RATE).toFixed(2));
-  const totalPrice = Number((itemsPrice + deliveryPrice + taxPrice).toFixed(2));
+  let pricing;
+  try {
+    pricing = await computeOrderPricing(itemsPrice, couponCode);
+  } catch (err) {
+    res.status(400);
+    throw err;
+  }
+  const { discountAmount, deliveryPrice, taxPrice, totalPrice, appliedCoupon } = pricing;
 
   const order = await Order.create({
     user: req.user._id,
@@ -48,9 +50,13 @@ export const createOrder = asyncHandler(async (req, res) => {
     itemsPrice,
     taxPrice,
     deliveryPrice,
+    couponCode: appliedCoupon?.code || "",
+    discountAmount,
     totalPrice,
-    isPaid: paymentMethod === "CashOnDelivery" ? false : false,
+    isPaid: false,
   });
+
+  await markCouponUsed(appliedCoupon);
 
   res.status(201).json({ success: true, order });
 });
@@ -78,6 +84,31 @@ export const getOrderById = asyncHandler(async (req, res) => {
     res.status(403);
     throw new Error("Not authorized to view this order");
   }
+
+  res.json({ success: true, order });
+});
+
+// @desc    Cancel own order (only while still Pending or Confirmed)
+// @route   PUT /api/orders/:id/cancel
+// @access  Private
+export const cancelMyOrder = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id);
+
+  if (!order) {
+    res.status(404);
+    throw new Error("Order not found");
+  }
+  if (order.user.toString() !== req.user._id.toString()) {
+    res.status(403);
+    throw new Error("Not authorized to cancel this order");
+  }
+  if (!["Pending", "Confirmed"].includes(order.status)) {
+    res.status(400);
+    throw new Error(`Order cannot be cancelled once it is ${order.status}`);
+  }
+
+  order.status = "Cancelled";
+  await order.save();
 
   res.json({ success: true, order });
 });

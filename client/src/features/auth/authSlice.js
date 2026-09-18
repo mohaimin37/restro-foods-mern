@@ -1,11 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../api/axios";
+import api, { TOKEN_KEY } from "../../api/axios";
 
 export const registerUser = createAsyncThunk(
   "auth/register",
   async (payload, { rejectWithValue }) => {
     try {
       const { data } = await api.post("/auth/register", payload);
+      localStorage.setItem(TOKEN_KEY, data.token);
       return data.user;
     } catch (err) {
       return rejectWithValue(err.message);
@@ -18,6 +19,7 @@ export const loginUser = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const { data } = await api.post("/auth/login", payload);
+      localStorage.setItem(TOKEN_KEY, data.token);
       return data.user;
     } catch (err) {
       return rejectWithValue(err.message);
@@ -26,7 +28,11 @@ export const loginUser = createAsyncThunk(
 );
 
 export const logoutUser = createAsyncThunk("auth/logout", async () => {
-  await api.post("/auth/logout");
+  try {
+    await api.post("/auth/logout");
+  } finally {
+    localStorage.removeItem(TOKEN_KEY);
+  }
 });
 
 export const fetchMe = createAsyncThunk("auth/fetchMe", async (_, { rejectWithValue }) => {
@@ -105,6 +111,7 @@ const authSlice = createSlice({
         state.status = "idle";
         state.user = null;
         state.initialCheckDone = true;
+        localStorage.removeItem(TOKEN_KEY);
       })
       .addCase(updateProfile.fulfilled, (state, action) => {
         state.user = action.payload;

@@ -1,19 +1,34 @@
-import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { FaLeaf, FaDrumstickBite, FaShoppingCart } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { FaLeaf, FaDrumstickBite, FaShoppingCart, FaHeart, FaRegHeart } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import StarRating from "./StarRating";
 import { addToCart } from "../features/cart/cartSlice";
+import { toggleFavorite, selectIsFavorite } from "../features/favorites/favoritesSlice";
 import { formatPrice } from "../utils/format";
 
 const DishCard = ({ dish }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+  const isFavorite = useSelector(selectIsFavorite(dish._id));
 
   const handleAdd = (e) => {
     e.preventDefault();
     dispatch(addToCart(dish));
     toast.success(`${dish.name} added to cart`);
+  };
+
+  const handleFavorite = (e) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error("Please login to save favorites");
+      navigate("/login");
+      return;
+    }
+    dispatch(toggleFavorite(dish));
+    toast.success(isFavorite ? "Removed from favorites" : "Added to favorites");
   };
 
   return (
@@ -37,6 +52,13 @@ const DishCard = ({ dish }) => {
           >
             {dish.isVeg ? <FaLeaf size={11} /> : <FaDrumstickBite size={11} />}
           </span>
+          <button
+            onClick={handleFavorite}
+            aria-label="Toggle favorite"
+            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-red-500 shadow-sm transition-transform hover:scale-110 dark:bg-ink-900/80"
+          >
+            {isFavorite ? <FaHeart size={14} /> : <FaRegHeart size={14} />}
+          </button>
           {!dish.isAvailable && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/60">
               <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-ink-900">

@@ -32,6 +32,8 @@ const orderSchema = new mongoose.Schema(
     itemsPrice: { type: Number, required: true, default: 0 },
     taxPrice: { type: Number, required: true, default: 0 },
     deliveryPrice: { type: Number, required: true, default: 0 },
+    couponCode: { type: String, default: "" },
+    discountAmount: { type: Number, default: 0 },
     totalPrice: { type: Number, required: true, default: 0 },
     isPaid: { type: Boolean, default: false },
     paidAt: { type: Date },

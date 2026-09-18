@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
-import { FaArrowLeft, FaMapMarkerAlt, FaPhoneAlt } from "react-icons/fa";
+import { FaArrowLeft, FaMapMarkerAlt, FaPhoneAlt, FaBan } from "react-icons/fa";
 import Loader from "../components/Loader";
 import OrderStatusBadge from "../components/OrderStatusBadge";
-import { getOrderById } from "../api/orderApi";
+import { getOrderById, cancelMyOrder } from "../api/orderApi";
 import { formatPrice } from "../utils/format";
 
 const steps = ["Pending", "Confirmed", "Preparing", "Out for Delivery", "Delivered"];
@@ -14,13 +14,32 @@ const OrderDetail = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [cancelling, setCancelling] = useState(false);
 
-  useEffect(() => {
+  const load = () =>
     getOrderById(id)
       .then((data) => setOrder(data.order))
       .catch((err) => toast.error(err.message))
       .finally(() => setLoading(false));
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  const handleCancel = async () => {
+    if (!window.confirm("Cancel this order?")) return;
+    setCancelling(true);
+    try {
+      await cancelMyOrder(id);
+      toast.success("Order cancelled");
+      load();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   if (loading) return <Loader full />;
   if (!order) return null;
@@ -102,6 +121,11 @@ const OrderDetail = () => {
             <h3 className="mb-3 font-display font-bold text-ink-900 dark:text-white">Payment Summary</h3>
             <div className="space-y-2 text-sm text-ink-600 dark:text-ink-300">
               <div className="flex justify-between"><span>Subtotal</span><span>{formatPrice(order.itemsPrice)}</span></div>
+              {order.discountAmount > 0 && (
+                <div className="flex justify-between text-green-600 dark:text-green-400">
+                  <span>Coupon ({order.couponCode})</span><span>-{formatPrice(order.discountAmount)}</span>
+                </div>
+              )}
               <div className="flex justify-between"><span>Delivery</span><span>{order.deliveryPrice === 0 ? "Free" : formatPrice(order.deliveryPrice)}</span></div>
               <div className="flex justify-between"><span>GST</span><span>{formatPrice(order.taxPrice)}</span></div>
               <div className="my-2 border-t border-dashed border-ink-200 dark:border-ink-700" />
@@ -113,6 +137,16 @@ const OrderDetail = () => {
               {order.paymentMethod} · {order.isPaid ? "Paid" : "Payment pending"}
             </p>
           </div>
+
+          {["Pending", "Confirmed"].includes(order.status) && (
+            <button
+              onClick={handleCancel}
+              disabled={cancelling}
+              className="btn-outline w-full text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+            >
+              <FaBan size={13} /> {cancelling ? "Cancelling..." : "Cancel Order"}
+            </button>
+          )}
         </div>
       </div>
     </div>

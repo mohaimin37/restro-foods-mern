@@ -7,6 +7,7 @@ import {
   FaStar,
   FaUsers,
   FaArrowLeft,
+  FaTag,
 } from "react-icons/fa";
 
 const links = [
@@ -15,6 +16,7 @@ const links = [
   { to: "/admin/orders", label: "Orders", icon: FaClipboardList },
   { to: "/admin/reservations", label: "Reservations", icon: FaCalendarCheck },
   { to: "/admin/reviews", label: "Reviews", icon: FaStar },
+  { to: "/admin/coupons", label: "Coupons", icon: FaTag },
   { to: "/admin/users", label: "Users", icon: FaUsers },
 ];
 

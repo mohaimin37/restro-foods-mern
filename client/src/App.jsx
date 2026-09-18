@@ -7,6 +7,7 @@ import Layout from "./components/Layout";
 import AdminLayout from "./components/AdminLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { fetchMe } from "./features/auth/authSlice";
+import { fetchFavorites, clearFavorites } from "./features/favorites/favoritesSlice";
 
 import Home from "./pages/Home";
 import Menu from "./pages/Menu";
@@ -19,6 +20,7 @@ import OrderDetail from "./pages/OrderDetail";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import Favorites from "./pages/Favorites";
 import Reservation from "./pages/Reservation";
 import MyReservations from "./pages/MyReservations";
 import NotFound from "./pages/NotFound";
@@ -29,14 +31,24 @@ import ManageOrders from "./pages/admin/ManageOrders";
 import ManageReservations from "./pages/admin/ManageReservations";
 import ManageReviews from "./pages/admin/ManageReviews";
 import ManageUsers from "./pages/admin/ManageUsers";
+import ManageCoupons from "./pages/admin/ManageCoupons";
 
 function App() {
   const dispatch = useDispatch();
   const theme = useSelector((state) => state.ui.theme);
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     dispatch(fetchMe());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (user) {
+      dispatch(fetchFavorites());
+    } else {
+      dispatch(clearFavorites());
+    }
+  }, [user, dispatch]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
@@ -60,6 +72,7 @@ function App() {
             <Route path="/orders" element={<Orders />} />
             <Route path="/orders/:id" element={<OrderDetail />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/favorites" element={<Favorites />} />
             <Route path="/reservation" element={<Reservation />} />
             <Route path="/my-reservations" element={<MyReservations />} />
           </Route>
@@ -75,6 +88,7 @@ function App() {
             <Route path="reservations" element={<ManageReservations />} />
             <Route path="reviews" element={<ManageReviews />} />
             <Route path="users" element={<ManageUsers />} />
+            <Route path="coupons" element={<ManageCoupons />} />
           </Route>
         </Route>
       </Routes>

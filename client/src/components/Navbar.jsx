@@ -11,6 +11,7 @@ import {
   FaSun,
   FaUtensils,
   FaChartLine,
+  FaHeart,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { logoutUser } from "../features/auth/authSlice";
@@ -130,6 +131,13 @@ const Navbar = () => {
                     className="flex items-center gap-2 px-4 py-2.5 text-sm text-ink-700 hover:bg-ink-50 dark:text-ink-200 dark:hover:bg-ink-800"
                   >
                     <FaUtensils /> My Reservations
+                  </Link>
+                  <Link
+                    to="/favorites"
+                    onClick={() => setProfileOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-ink-700 hover:bg-ink-50 dark:text-ink-200 dark:hover:bg-ink-800"
+                  >
+                    <FaHeart /> My Favorites
                   </Link>
                   {user.role === "admin" && (
                     <Link

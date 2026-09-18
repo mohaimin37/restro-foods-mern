@@ -17,6 +17,8 @@ import reviewRoutes from "./routes/reviewRoutes.js";
 import reservationRoutes from "./routes/reservationRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import couponRoutes from "./routes/couponRoutes.js";
+import favoriteRoutes from "./routes/favoriteRoutes.js";
 import { stripeWebhook } from "./controllers/paymentController.js";
 
 dotenv.config();
@@ -57,6 +59,8 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/reservations", reservationRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/coupons", couponRoutes);
+app.use("/api/favorites", favoriteRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

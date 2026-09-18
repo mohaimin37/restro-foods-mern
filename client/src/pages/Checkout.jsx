@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { FaCreditCard, FaMoneyBillWave, FaLock } from "react-icons/fa";
+import { FaCreditCard, FaMoneyBillWave, FaLock, FaTag, FaTimesCircle } from "react-icons/fa";
 import { selectCartItems, selectCartSubtotal, clearCart } from "../features/cart/cartSlice";
 import { createCheckoutSession } from "../api/paymentApi";
 import { createOrder } from "../api/orderApi";
+import { validateCoupon } from "../api/couponApi";
 import { formatPrice } from "../utils/format";
 import { TAX_RATE, DELIVERY_FEE, FREE_DELIVERY_THRESHOLD } from "../utils/pricing";
 
@@ -26,11 +27,37 @@ const Checkout = () => {
     phone: user?.phone || "",
   });
 
-  const deliveryFee = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
-  const tax = Number((subtotal * TAX_RATE).toFixed(2));
-  const total = Number((subtotal + deliveryFee + tax).toFixed(2));
+  const [couponInput, setCouponInput] = useState("");
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState(null); // { code, discountAmount }
+
+  const discountAmount = appliedCoupon?.discountAmount || 0;
+  const discountedSubtotal = Math.max(subtotal - discountAmount, 0);
+  const deliveryFee = discountedSubtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
+  const tax = Number((discountedSubtotal * TAX_RATE).toFixed(2));
+  const total = Number((discountedSubtotal + deliveryFee + tax).toFixed(2));
 
   const handleChange = (e) => setAddress({ ...address, [e.target.name]: e.target.value });
+
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) return;
+    setApplyingCoupon(true);
+    try {
+      const data = await validateCoupon(couponInput.trim(), subtotal);
+      setAppliedCoupon({ code: data.coupon.code, discountAmount: data.discountAmount });
+      toast.success(`Coupon ${data.coupon.code} applied!`);
+    } catch (err) {
+      toast.error(err.message);
+      setAppliedCoupon(null);
+    } finally {
+      setApplyingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput("");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,6 +67,7 @@ const Checkout = () => {
     const payload = {
       items: items.map((i) => ({ menuItem: i.menuItem, name: i.name, quantity: i.quantity })),
       shippingAddress: address,
+      couponCode: appliedCoupon?.code || undefined,
     };
 
     try {
@@ -136,6 +164,39 @@ const Checkout = () => {
               </button>
             </div>
           </div>
+
+          <div className="card p-6">
+            <h2 className="mb-4 flex items-center gap-2 font-display text-lg font-bold text-ink-900 dark:text-white">
+              <FaTag className="text-brand-600" /> Have a Coupon?
+            </h2>
+            {appliedCoupon ? (
+              <div className="flex items-center justify-between rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-300">
+                <span className="font-semibold">
+                  {appliedCoupon.code} applied — you saved {formatPrice(appliedCoupon.discountAmount)}
+                </span>
+                <button type="button" onClick={handleRemoveCoupon} aria-label="Remove coupon">
+                  <FaTimesCircle />
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  value={couponInput}
+                  onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                  placeholder="e.g. WELCOME50"
+                  className="input flex-1"
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyCoupon}
+                  disabled={applyingCoupon}
+                  className="btn-outline"
+                >
+                  {applyingCoupon ? "Checking..." : "Apply"}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="card h-fit p-6">
@@ -151,6 +212,11 @@ const Checkout = () => {
           <div className="my-4 border-t border-dashed border-ink-200 dark:border-ink-700" />
           <div className="space-y-2 text-sm text-ink-600 dark:text-ink-300">
             <div className="flex justify-between"><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
+            {discountAmount > 0 && (
+              <div className="flex justify-between text-green-600 dark:text-green-400">
+                <span>Coupon Discount</span><span>-{formatPrice(discountAmount)}</span>
+              </div>
+            )}
             <div className="flex justify-between"><span>Delivery</span><span>{deliveryFee === 0 ? "Free" : formatPrice(deliveryFee)}</span></div>
             <div className="flex justify-between"><span>GST</span><span>{formatPrice(tax)}</span></div>
           </div>

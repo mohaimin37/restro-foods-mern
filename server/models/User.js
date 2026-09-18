@@ -28,6 +28,7 @@ const userSchema = new mongoose.Schema(
     },
     avatar: { type: String, default: "" },
     isActive: { type: Boolean, default: true },
+    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "MenuItem" }],
   },
   { timestamps: true }
 );

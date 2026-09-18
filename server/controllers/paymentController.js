@@ -1,19 +1,16 @@
-﻿import Stripe from "stripe";
+import Stripe from "stripe";
 import asyncHandler from "../middleware/asyncHandler.js";
 import Order from "../models/Order.js";
 import MenuItem from "../models/MenuItem.js";
+import { computeOrderPricing, markCouponUsed } from "../utils/pricing.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-const TAX_RATE = 0.05; // GST
-const DELIVERY_FEE = 49;
-const FREE_DELIVERY_THRESHOLD = 499;
 
 // @desc    Create a Stripe Checkout session and a pending order
 // @route   POST /api/payments/create-checkout-session
 // @access  Private
 export const createCheckoutSession = asyncHandler(async (req, res) => {
-  const { items, shippingAddress } = req.body;
+  const { items, shippingAddress, couponCode } = req.body;
 
   if (!items || items.length === 0) {
     res.status(400);
@@ -39,9 +36,14 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
     };
   });
 
-  const deliveryPrice = itemsPrice >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
-  const taxPrice = Number((itemsPrice * TAX_RATE).toFixed(2));
-  const totalPrice = Number((itemsPrice + deliveryPrice + taxPrice).toFixed(2));
+  let pricing;
+  try {
+    pricing = await computeOrderPricing(itemsPrice, couponCode);
+  } catch (err) {
+    res.status(400);
+    throw err;
+  }
+  const { discountAmount, deliveryPrice, taxPrice, totalPrice, appliedCoupon } = pricing;
 
   const order = await Order.create({
     user: req.user._id,
@@ -51,6 +53,8 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
     itemsPrice,
     taxPrice,
     deliveryPrice,
+    couponCode: appliedCoupon?.code || "",
+    discountAmount,
     totalPrice,
     isPaid: false,
     status: "Pending",
@@ -67,7 +71,7 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
 
   if (taxPrice > 0) {
     line_items.push({
-      price_data: { currency: "inr", product_data: { name: "Tax" }, unit_amount: Math.round(taxPrice * 100) },
+      price_data: { currency: "inr", product_data: { name: "GST" }, unit_amount: Math.round(taxPrice * 100) },
       quantity: 1,
     });
   }
@@ -78,7 +82,7 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
     });
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const sessionParams = {
     payment_method_types: ["card"],
     mode: "payment",
     line_items,
@@ -86,7 +90,21 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
     metadata: { orderId: order._id.toString(), userId: req.user._id.toString() },
     success_url: `${process.env.CLIENT_URL}/order-success/${order._id}?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.CLIENT_URL}/checkout`,
-  });
+  };
+
+  if (discountAmount > 0) {
+    const stripeCoupon = await stripe.coupons.create({
+      amount_off: Math.round(discountAmount * 100),
+      currency: "inr",
+      duration: "once",
+      name: appliedCoupon.code,
+    });
+    sessionParams.discounts = [{ coupon: stripeCoupon.id }];
+  }
+
+  const session = await stripe.checkout.sessions.create(sessionParams);
+
+  await markCouponUsed(appliedCoupon);
 
   res.json({ success: true, url: session.url, orderId: order._id });
 });
@@ -153,4 +171,3 @@ export const verifyCheckoutSession = asyncHandler(async (req, res) => {
 
   res.json({ success: true, paymentStatus: session.payment_status });
 });
-

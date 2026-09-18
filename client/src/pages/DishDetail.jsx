@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { FaLeaf, FaDrumstickBite, FaFire, FaClock, FaMinus, FaPlus, FaShoppingCart } from "react-icons/fa";
+import { FaLeaf, FaDrumstickBite, FaFire, FaClock, FaMinus, FaPlus, FaShoppingCart, FaHeart, FaRegHeart } from "react-icons/fa";
 import Loader from "../components/Loader";
 import StarRating from "../components/StarRating";
 import ReviewForm from "../components/ReviewForm";
@@ -10,6 +10,7 @@ import ReviewList from "../components/ReviewList";
 import { getMenuItemById } from "../api/menuApi";
 import { getReviewsForItem, createReview, deleteReview } from "../api/reviewApi";
 import { addToCart } from "../features/cart/cartSlice";
+import { toggleFavorite, selectIsFavorite } from "../features/favorites/favoritesSlice";
 import { formatPrice } from "../utils/format";
 
 const DishDetail = () => {
@@ -17,6 +18,7 @@ const DishDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+  const isFavorite = useSelector(selectIsFavorite(id));
 
   const [dish, setDish] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -41,6 +43,16 @@ const DishDetail = () => {
   const handleAddToCart = () => {
     dispatch(addToCart({ ...dish, qty }));
     toast.success(`${qty} x ${dish.name} added to cart`);
+  };
+
+  const handleFavorite = () => {
+    if (!user) {
+      toast.error("Please login to save favorites");
+      navigate("/login");
+      return;
+    }
+    dispatch(toggleFavorite(dish));
+    toast.success(isFavorite ? "Removed from favorites" : "Added to favorites");
   };
 
   const handleReviewSubmit = async (payload) => {
@@ -100,9 +112,18 @@ const DishDetail = () => {
             </span>
           </div>
 
-          <h1 className="font-display text-3xl font-bold text-ink-900 dark:text-white sm:text-4xl">
-            {dish.name}
-          </h1>
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="font-display text-3xl font-bold text-ink-900 dark:text-white sm:text-4xl">
+              {dish.name}
+            </h1>
+            <button
+              onClick={handleFavorite}
+              aria-label="Toggle favorite"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-ink-200 text-red-500 hover:bg-red-50 dark:border-ink-700 dark:hover:bg-red-900/20"
+            >
+              {isFavorite ? <FaHeart size={18} /> : <FaRegHeart size={18} />}
+            </button>
+          </div>
 
           <div className="mt-3">
             <StarRating rating={dish.rating} count={dish.numReviews} showValue size={16} />
